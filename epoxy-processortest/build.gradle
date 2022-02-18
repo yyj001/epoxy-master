@@ -1,0 +1,78 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+  compileSdkVersion rootProject.COMPILE_SDK_VERSION
+
+  defaultConfig {
+    // Using 16 here as it is the minimum version of Paris, which we are restricted to.
+    minSdkVersion 16
+    targetSdkVersion rootProject.TARGET_SDK_VERSION
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  kotlinOptions {
+    jvmTarget = "1.8"
+  }
+
+  testOptions {
+    unitTests {
+      includeAndroidResources = true
+    }
+  }
+
+  dataBinding {
+    enabled = true
+  }
+}
+
+dependencies {
+  implementation rootProject.deps.androidRecyclerView
+  implementation project(':epoxy-annotations')
+  implementation project(':epoxy-adapter')
+  implementation project(':epoxy-databinding')
+  implementation project(':epoxy-processortest2')
+  // The processor uses coroutines, and for some reason we need to include it here too for the
+  // compiler tester to be able to instantiate the processor, otherwise the coroutine classes
+  // aren't found.
+  implementation rootProject.deps.kotlinCoroutines
+
+  kapt project(':epoxy-processor')
+  // Need to include the processor directly as well since we create an instance of it in code for testing
+  implementation project(':epoxy-processor')
+  implementation rootProject.deps.ksp
+
+  implementation rootProject.deps.paris
+  kapt rootProject.deps.parisProcessor
+  // Need to include the processor directly since we create an instance of it in code for testing
+  testImplementation rootProject.deps.parisProcessor
+
+  kapt rootProject.deps.autoValue
+
+  testImplementation files(rootProject.file("libs/rt.jar"))
+  testImplementation files(rootProject.file("libs/tools.jar"))
+  testImplementation rootProject.deps.googleTestingCompile
+  testImplementation "io.github.java-diff-utils:java-diff-utils:4.5"
+  testImplementation "io.strikt:strikt-core:0.31.0"
+  testImplementation rootProject.deps.kotlinCompileTesting
+}
+
+// Java files in the "resources" folder are not included in the build for some reason (seems like source files are skipped?)
+// This files are needed to test the annotation processor, so we manually copy them into the build.
+task('copyDebugTestResources', type: Copy) {
+  from("${projectDir}/src/test/resources")
+  into("${buildDir}/intermediates/sourceFolderJavaResources/debug")
+}
+
+task('copyReleaseTestResources', type: Copy) {
+  from("${projectDir}/src/test/resources")
+  into("${buildDir}/intermediates/sourceFolderJavaResources/release")
+}
+
+preBuild.dependsOn copyReleaseTestResources
+preBuild.dependsOn copyDebugTestResources

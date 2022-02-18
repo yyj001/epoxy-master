@@ -1,0 +1,20 @@
+apply plugin: 'com.android.library'
+
+android {
+  compileSdkVersion rootProject.COMPILE_SDK_VERSION
+
+  defaultConfig {
+    minSdkVersion rootProject.MIN_SDK_VERSION
+    targetSdkVersion rootProject.TARGET_SDK_VERSION
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+}
+
+dependencies {
+  implementation project(':epoxy-adapter')
+  implementation project(':epoxy-annotations')
+}

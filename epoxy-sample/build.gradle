@@ -1,0 +1,67 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+  compileSdkVersion rootProject.COMPILE_SDK_VERSION
+
+  // For java 8 lambdas
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  defaultConfig {
+    applicationId "com.airbnb.android.epoxysample"
+    minSdkVersion 21
+    targetSdkVersion rootProject.TARGET_SDK_VERSION
+    vectorDrawables.useSupportLibrary = true
+    versionCode 1
+    versionName "1.0"
+  }
+
+  dataBinding {
+    enabled = true
+  }
+}
+
+kapt {
+  correctErrorTypes = true
+}
+
+project.android.buildTypes.all { buildType ->
+  buildType.javaCompileOptions.annotationProcessorOptions.arguments =
+      [
+          validateEpoxyModelUsage      : String.valueOf(buildType.name == 'debug'),
+          requireHashCodeInEpoxyModels : "true",
+          requireAbstractEpoxyModels   : "true",
+          implicitlyAddAutoModels      : "true",
+          logEpoxyTimings              : "false",
+          enableParallelEpoxyProcessing: "false",
+      ]
+}
+
+dependencies {
+  def lifecycle_version = "2.1.0"
+
+  implementation 'com.google.android.material:material:1.4.0'
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+  implementation project(':epoxy-databinding')
+  implementation project(':epoxy-adapter')
+  implementation project(':epoxy-annotations')
+  kapt project(':epoxy-processor')
+
+  implementation rootProject.deps.paris
+  kapt rootProject.deps.parisProcessor
+//  implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+  implementation 'androidx.core:core-ktx:1.3.2'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
+  implementation rootProject.deps.androidCardView
+  implementation rootProject.deps.androidRecyclerView
+  implementation rootProject.deps.androidAppcompat
+  implementation rootProject.deps.versionedParcelable
+  implementation rootProject.deps.lottie
+
+  testImplementation rootProject.deps.junit
+}

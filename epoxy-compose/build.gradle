@@ -1,0 +1,49 @@
+plugins {
+  id 'com.android.library'
+  id 'kotlin-android'
+  id 'kotlin-kapt'
+}
+apply plugin: "com.vanniktech.maven.publish"
+
+android {
+  compileSdkVersion rootProject.COMPILE_SDK_VERSION
+
+  defaultConfig {
+    minSdkVersion rootProject.COMPOSE_MIN_SDK_VERSION
+    targetSdkVersion rootProject.TARGET_SDK_VERSION
+
+    consumerProguardFiles "consumer-rules.pro"
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+    }
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+  kotlinOptions {
+    jvmTarget = '1.8'
+  }
+  buildFeatures {
+    compose true
+  }
+  composeOptions {
+    kotlinCompilerExtensionVersion COMPOSE_VERSION
+  }
+}
+
+dependencies {
+  api project(':epoxy-annotations')
+  api project(':epoxy-adapter')
+
+  implementation rootProject.deps.composeUi
+  implementation rootProject.deps.activityCompose
+  implementation rootProject.deps.androidCoreKtx
+  implementation rootProject.deps.androidAppcompat
+  implementation rootProject.deps.androidDesignLibrary
+  implementation rootProject.deps.androidLifecycleRuntimeKtx
+}
